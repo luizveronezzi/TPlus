@@ -1,4 +1,6 @@
+using Api.Service;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace Api.Controllers
 {
@@ -14,25 +16,31 @@ namespace Api.Controllers
             _logger = logger;
         }
 
-        [HttpGet(Name = "CarregarArquivo")]
-        public List<string> Get(string file)
+        [HttpGet("CarregarArquivo")]
+        public List<string> CarregaArquivo(string file)
         {
-            List<string> line = new();
+            List<string> retorno = new();
             try
             {
-                StreamReader sr = new StreamReader(file);
-                line.Add(sr.ReadLine());
-                while (line != null)
-                {
-                    line.Add(sr.ReadLine());
-                }
-                sr.Close();
+                string regraFilmes = "Filmes |";
+                string regraSeries = "S{1}[0-9]{2}E{1}[0-9]{2}";
+
+                Ferramentas Ferramenta = new Ferramentas();
+
+                string conteudoArquivo = Ferramenta.CarregaArquivo(file);
+                string[] listaRetorno = Ferramenta.SplitString(conteudoArquivo, "#EXTINF");
+
+                var filmes = listaRetorno.Where(y => y.Contains(regraFilmes)).ToList();
+                var series = listaRetorno.Where(y => Regex.IsMatch(y, regraSeries)).ToList();
+                var canais = listaRetorno.Where(y => !Regex.IsMatch(y, regraSeries) && !y.Contains(regraFilmes)).ToList();
+
             }
             catch (Exception e)
             {
                 throw new Exception(e.Message);
             }
-            return line;
+            return retorno;
         }
+
     }
 }
