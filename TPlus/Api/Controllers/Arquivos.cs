@@ -1,3 +1,4 @@
+using Api.Model;
 using Api.Service;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
@@ -17,7 +18,7 @@ namespace Api.Controllers
         }
 
         [HttpGet("CarregarArquivo")]
-        public List<string> CarregaArquivo(string file)
+        public List<string> CarregaArquivo(string file = "C:\\Users\\luiz.veronezzi.FW\\Downloads\\279999-full.m3u")
         {
             List<string> retorno = new();
             try
@@ -29,11 +30,27 @@ namespace Api.Controllers
 
                 string conteudoArquivo = Ferramenta.CarregaArquivo(file);
                 string[] listaRetorno = Ferramenta.SplitString(conteudoArquivo, "#EXTINF");
+                //string[] listaRetorno = Ferramenta.SplitString(conteudoArquivo, "group-title=");
 
-                var filmes = listaRetorno.Where(y => y.Contains(regraFilmes)).ToList();
-                var series = listaRetorno.Where(y => Regex.IsMatch(y, regraSeries)).ToList();
-                var canais = listaRetorno.Where(y => !Regex.IsMatch(y, regraSeries) && !y.Contains(regraFilmes)).ToList();
 
+                var listaFilmes = listaRetorno.Where(y => y.Contains(regraFilmes)).ToList();
+                var listaSeries = listaRetorno.Where(y => Regex.IsMatch(y, regraSeries)).ToList();
+                var listaCanais = listaRetorno.Where(y => !Regex.IsMatch(y, regraSeries) && !y.Contains(regraFilmes)).ToList();
+                //var tvg1 = Ferramenta.SplitPos(listaCanais[1], "tvg-logo");
+
+                List<Listas> canais = listaCanais.
+                                Select(x => new Listas
+                                {
+                                    Categoria = x.Substring(Ferramenta.SplitPos(x, "group-title=")),
+                                    Titulo = x.Substring(Ferramenta.SplitPos(x, "tvg-name=")),
+                                    Logo = x.Substring(Ferramenta.SplitPos(x, "tvg-logo=")),
+                                    Link = x.Substring(Ferramenta.SplitPos(x, "http"))
+                                })
+                                .ToList();
+                //item.Substring(Ferramenta.SplitPos(item, "group-title="), 13)
+
+                // var tt = Ferramenta.SplitString(conteudoArquivo, "group-title=");
+                // var xx = tt.Where(y => Regex.IsMatch(y, regraSeries)).ToList();
             }
             catch (Exception e)
             {

@@ -17,5 +17,14 @@ namespace Api.Service
 
             return listaRetorno;
         }
+
+        public int SplitPos(string strOrigem, string strPadrao)
+        {
+            Regex regraPadrao = new Regex(strPadrao, RegexOptions.Multiline);
+            Match posicao = regraPadrao.Match(strOrigem);
+
+            return posicao.Index;
+        }
+
     }
 }
