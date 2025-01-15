@@ -36,9 +36,9 @@ namespace Api.Controllers
                 var listaFilmes = listaRetorno.Where(y => y.Contains(regraFilmes)).ToList();
                 var listaSeries = listaRetorno.Where(y => Regex.IsMatch(y, regraSeries)).ToList();
                 var listaCanais = listaRetorno.Where(y => !Regex.IsMatch(y, regraSeries) && !y.Contains(regraFilmes)).ToList();
-                List<Listas> canais = listaCanais.
-                                Select(x => Ferramenta.RetornaDetalhes(x))
-                                .ToList();
+                List<Listas> canais = listaCanais.Select(x => Ferramenta.RetornaDetalhes(x)).ToList();
+                List<Listas> series = listaSeries.Select(x => Ferramenta.RetornaDetalhes(x)).ToList();
+                List<Listas> filmes = listaFilmes.Select(x => Ferramenta.RetornaDetalhes(x)).ToList();
             }
             catch (Exception e)
             {
