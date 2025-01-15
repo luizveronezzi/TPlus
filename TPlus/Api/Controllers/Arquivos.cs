@@ -36,21 +36,9 @@ namespace Api.Controllers
                 var listaFilmes = listaRetorno.Where(y => y.Contains(regraFilmes)).ToList();
                 var listaSeries = listaRetorno.Where(y => Regex.IsMatch(y, regraSeries)).ToList();
                 var listaCanais = listaRetorno.Where(y => !Regex.IsMatch(y, regraSeries) && !y.Contains(regraFilmes)).ToList();
-                //var tvg1 = Ferramenta.SplitPos(listaCanais[1], "tvg-logo");
-
                 List<Listas> canais = listaCanais.
-                                Select(x => new Listas
-                                {
-                                    Categoria = x.Substring(Ferramenta.SplitPos(x, "group-title=")),
-                                    Titulo = x.Substring(Ferramenta.SplitPos(x, "tvg-name=")),
-                                    Logo = x.Substring(Ferramenta.SplitPos(x, "tvg-logo=")),
-                                    Link = x.Substring(Ferramenta.SplitPos(x, "http"))
-                                })
+                                Select(x => Ferramenta.RetornaDetalhes(x))
                                 .ToList();
-                //item.Substring(Ferramenta.SplitPos(item, "group-title="), 13)
-
-                // var tt = Ferramenta.SplitString(conteudoArquivo, "group-title=");
-                // var xx = tt.Where(y => Regex.IsMatch(y, regraSeries)).ToList();
             }
             catch (Exception e)
             {
