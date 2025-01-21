@@ -1,6 +1,7 @@
 using Api.Model;
 using Api.Service;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Api.Controllers
@@ -31,13 +32,31 @@ namespace Api.Controllers
                 string conteudoArquivo = Ferramenta.CarregaArquivo(file);
                 string[] listaRetorno = Ferramenta.SplitString(conteudoArquivo, "#EXTINF");
 
-                var listaFilmes = listaRetorno.Where(y => y.Contains(regraFilmes)).ToList();
-                var listaSeries = listaRetorno.Where(y => Regex.IsMatch(y, regraSeries)).ToList();
-                var listaCanais = listaRetorno.Where(y => !Regex.IsMatch(y, regraSeries) && !y.Contains(regraFilmes)).ToList();
+                var listaCanais = listaRetorno.Where(y => !Regex.IsMatch(y, regraSeries) && !y.Contains(regraFilmes)).Select(x => Ferramenta.RetornaDetalhes(x)).ToList();
+                var listaSeries = listaRetorno.Where(y => Regex.IsMatch(y, regraSeries)).Select(x => Ferramenta.RetornaDetalhes(x)).ToList();
+                var listaFilmes = listaRetorno.Where(y => y.Contains(regraFilmes)).Select(x => Ferramenta.RetornaDetalhes(x)).ToList();
 
-                retorno.Add(new Catalogo { Descricao = "Canais", Lista = listaCanais.Select(x => Ferramenta.RetornaDetalhes(x)).ToList() });
-                retorno.Add(new Catalogo { Descricao = "Series", Lista = listaSeries.Select(x => Ferramenta.RetornaDetalhes(x)).ToList() });
-                retorno.Add(new Catalogo { Descricao = "Filmes", Lista = listaFilmes.Select(x => Ferramenta.RetornaDetalhes(x)).ToList() });
+                retorno.Add(new Catalogo
+                {
+                    Descricao = "Canais",
+                    ListaTotal = listaCanais,
+                    ListaFiltro = listaCanais
+                });
+
+                retorno.Add(new Catalogo
+                {
+                    Descricao = "Series",
+                    ListaTotal = listaSeries,
+                    ListaFiltro = listaSeries.GroupBy(x => x.Titulo, (key, y) => y.Select(e => new Listas { Categoria = e.Categoria, Titulo = e.Titulo, Temporada = "(" + y.DistinctBy(a => a.Temporada).Count() + ")" }).First())
+                    .ToList()
+                });
+
+                retorno.Add(new Catalogo
+                {
+                    Descricao = "Filmes",
+                    ListaTotal = listaFilmes,
+                    ListaFiltro = listaFilmes.GroupBy(x => x.Logo, (key, y) => y.OrderBy(e => e.Titulo).First()).ToList()
+                });
 
             }
             catch (Exception e)
