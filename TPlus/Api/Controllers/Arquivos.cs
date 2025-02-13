@@ -1,5 +1,6 @@
 using Api.Model;
 using Api.Service;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -57,6 +58,10 @@ namespace Api.Controllers
                     ListaTotal = listaFilmes,
                     ListaFiltro = listaFilmes.GroupBy(x => x.Logo, (key, y) => y.OrderBy(e => e.Titulo).First()).ToList()
                 });
+
+                var xx = retorno[0].ListaFiltro.GroupBy(x => x.Categoria, (key, y) => y.Select(e => new Listas { Categoria = e.Categoria, Ordem = 0 }).First());
+                var x1 = retorno[1].ListaFiltro.GroupBy(x => x.Categoria).ToList();
+                var x2 = retorno[2].ListaFiltro.GroupBy(x => x.Categoria).ToList();
 
             }
             catch (Exception e)

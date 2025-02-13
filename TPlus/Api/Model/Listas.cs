@@ -10,5 +10,6 @@ namespace Api.Model
         public string Link { get; set; }
         public string Temporada { get; set; }
         public string Episodios { get; set; }
+        public  int Ordem { get; set; }
     }
 }
