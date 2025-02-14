@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Data;
 using System.Net.Http.Headers;
 using TVPlus.Interface;
 using TVPlus.Model;
@@ -9,7 +10,7 @@ namespace TVPlus.Services
 
     {
         public string token { get; set; }
-        public List<string> parametros { get; set; } = new List<string>();
+        public string parametros { get; set; } = string.Empty;
 
         private readonly IConfiguration _configuration;
         private readonly HttpClient _httpClient;
@@ -30,14 +31,25 @@ namespace TVPlus.Services
             _httpClient.BaseAddress = new System.Uri(urlNova);
         }
 
+        public void SetParameters(Dictionary<string, dynamic> parameters)
+        {
+            string sets = "?";
+            string value;
+
+            foreach (var item in parameters)
+            {
+                value = Convert.ToString(item.Value);
+                value = System.Uri.EscapeDataString(value);
+                sets += item.Key + "=" + value + "&";
+            }
+            this.parametros = sets.Substring(0, sets.Length - 1);
+        }
+
         public async Task<apiretorno> GetAPI(string nameApi)
         {
             if (this.parametros != null)
             {
-                foreach (var item in this.parametros)
-                {
-                    nameApi = string.Concat(nameApi, "/" + item);
-                }
+                nameApi = string.Concat(nameApi, this.parametros);
             }
 
             if (this.token != null)
@@ -55,10 +67,7 @@ namespace TVPlus.Services
         {
             if (this.parametros != null)
             {
-                foreach (var item in this.parametros)
-                {
-                    nameApi = string.Concat(nameApi, "/" + item);
-                }
+                nameApi = string.Concat(nameApi, this.parametros);
             }
 
             if (this.token != null)
@@ -76,10 +85,7 @@ namespace TVPlus.Services
         {
             if (this.parametros != null)
             {
-                foreach (var item in this.parametros)
-                {
-                    nameApi = string.Concat(nameApi, "/" + item);
-                }
+                nameApi = string.Concat(nameApi, this.parametros);
             }
 
             if (this.token != null)
@@ -97,10 +103,7 @@ namespace TVPlus.Services
         {
             if (this.parametros != null)
             {
-                foreach (var item in this.parametros)
-                {
-                    nameApi = string.Concat(nameApi, "/" + item);
-                }
+                nameApi = string.Concat(nameApi, this.parametros);
             }
 
             if (this.token != null)
@@ -114,23 +117,18 @@ namespace TVPlus.Services
             return resposta;
         }
 
-        public async Task<object> GetData<T>(dynamic data)
+        public async Task<object> GetData<T>(apiretorno data)
         {
-            string output = await Task.Run(() => JsonConvert.SerializeObject(data));
-            var retorno = await Task.Run(() => JsonConvert.DeserializeObject<T>(output));
+            var retorno = await Task.Run(() => JsonConvert.DeserializeObject<T>(data.data));
             return retorno;
         }
 
         private async Task<apiretorno> Verifica_Acesso(HttpResponseMessage response)
         {
             apiretorno resposta = new();
-            if ((int)response.StatusCode != 200 && (int)response.StatusCode != 400)
+
+            if (!response.IsSuccessStatusCode)
             {
-                if ((int)response.StatusCode == 500)
-                {
-
-                }
-
                 resposta.statuscode = (int)response.StatusCode;
                 resposta.success = false;
                 resposta.mensage = response.ReasonPhrase;
@@ -138,6 +136,7 @@ namespace TVPlus.Services
             else
             {
                 resposta = await response.Content.ReadFromJsonAsync<apiretorno>();
+                resposta.data = await response.Content.ReadAsStringAsync();
             }
             return resposta;
         }
