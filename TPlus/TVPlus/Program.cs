@@ -5,8 +5,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<IIntegracaoApi,IntegracaoApi>();
-builder.Services.AddScoped<ITmdb,Tmdb>();
+builder.Services.AddSingleton<IIntegracaoApi,IntegracaoApi>();
+builder.Services.AddSingleton<ITmdb,Tmdb>();
 
 var app = builder.Build();
 
