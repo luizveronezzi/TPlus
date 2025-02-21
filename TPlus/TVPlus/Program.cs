@@ -1,11 +1,12 @@
-using TVPlus.Services;
 using TVPlus.Interface;
+using TVPlus.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<IIntegracaoApi>(s => new IntegracaoApi(builder.Configuration));
+builder.Services.AddScoped<IIntegracaoApi,IntegracaoApi>();
+builder.Services.AddScoped<ITmdb,Tmdb>();
 
 var app = builder.Build();
 

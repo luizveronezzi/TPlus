@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
-using System.Data;
 using System.Net.Http.Headers;
 using TVPlus.Interface;
 using TVPlus.Model;
 
-namespace TVPlus.Services
+namespace TVPlus.Service
 {
     public class IntegracaoApi : IIntegracaoApi
 

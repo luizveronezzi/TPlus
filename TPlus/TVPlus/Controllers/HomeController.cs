@@ -1,34 +1,31 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using TVPlus.Interface;
 using TVPlus.Models;
-using TVPlus.Service;
-using TVPlus.Services;
 
 namespace TVPlus.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IConfiguration _configuration;
-        public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
+        private readonly ITmdb _tmdb;
+        public HomeController(ILogger<HomeController> logger,ITmdb tmdb)
         {
             _logger = logger;
-            _configuration = configuration;
+            _tmdb = tmdb;  
         }
 
         public async Task<IActionResult> Index()
         {
             try
             {
-                Tmdb tmdb = new(_logger,_configuration);
+                var generoTV = await _tmdb.GenerosSeries();
+                var generoFilme = await _tmdb.GenerosFilmes();
+                var resultadoFilme = await _tmdb.PesquisaFilmes("Armagedon");
+                var resultadoSerie = await _tmdb.PesquisaSeries("Dexter");
 
-                var generoTV = await tmdb.GenerosSeries();
-                var generoFilme = await tmdb.GenerosFilmes();
-                var resultadoFilme = await tmdb.PesquisaFilmes("Armagedon");
-                var resultadoSerie = await tmdb.PesquisaSeries("Dexter");
-
-                var detalheFilmes = await tmdb.DetalheFilmes(resultadoFilme.results[0].id);
-                var detalheSeries = await tmdb.DetalheSeries(resultadoSerie.results[0].id);
+                var detalheFilmes = await _tmdb.DetalheFilmes(resultadoFilme.results[0].id);
+                var detalheSeries = await _tmdb.DetalheSeries(resultadoSerie.results[0].id);
 
                 var listGen = resultadoFilme.results[0].genre_ids;
                 List<string> gens = generoFilme.genres.Where(x => listGen.Contains(x.id)).Select(x => x.name).ToList();
@@ -40,8 +37,6 @@ namespace TVPlus.Controllers
                 throw new Exception(e.Message);
             }
 
-            ///search/movie?query=Mumia&include_adult=false&language=en-US&page=1'
-            ///search/tv?query=Round%206&include_adult=false&language=en-US&page=1' 
             return View();
         }
 

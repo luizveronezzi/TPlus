@@ -11,7 +11,9 @@ namespace TVPlus.Interface
         Task<apiretorno> PostAPI<T>(string nameApi, T body);
         Task<apiretorno> PutAPI<T>(string nameApi, T body);
         Task<apiretorno> DeleteAPI(string nameApi);
-        Task<object> GetData<T>(apiretorno data);
+        Task<dynamic> GetData<T>(apiretorno data);
+        void SetUrlbase(string urlNova);
+        void SetParameters(Dictionary<string, dynamic> parameters);
 
     }
 }
