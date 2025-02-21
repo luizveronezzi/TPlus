@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Diagnostics;
-using TVPlus.Model;
 using TVPlus.Models;
+using TVPlus.Service;
 using TVPlus.Services;
 
 namespace TVPlus.Controllers
@@ -21,31 +20,18 @@ namespace TVPlus.Controllers
         {
             try
             {
-                IntegracaoApi Api = new IntegracaoApi(_configuration);
-                Api.token = _configuration["APIConfig:TokenHi"];
-                Api.SetParameters(
-                    new Dictionary<string, dynamic> {
-                        { "query", "Round 6" },
-                        { "include_adult",false },
-                        { "language","pt-BR" },
-                        { "page",1 }
-                    }
-                );
+                Tmdb tmdb = new(_logger,_configuration);
 
-                var pesqTV = await Api.GetAPI("search/tv");
-                var resultadoTV = await Api.GetData<PesquisaSeries>(pesqTV);
+                var generoTV = await tmdb.GenerosSeries();
+                var generoFilme = await tmdb.GenerosFilmes();
+                var resultadoFilme = await tmdb.PesquisaFilmes("Armagedon");
+                var resultadoSerie = await tmdb.PesquisaSeries("Dexter");
 
-                Api.SetParameters(
-                    new Dictionary<string, dynamic> {
-                        { "query", "Mumia" },
-                        { "include_adult",false },
-                        { "language","pt-BR" },
-                        { "page",1 }
-                    }
-                );
+                var detalheFilmes = await tmdb.DetalheFilmes(resultadoFilme.results[0].id);
+                var detalheSeries = await tmdb.DetalheSeries(resultadoSerie.results[0].id);
 
-                var pesqFilme = await Api.GetAPI("search/movie");
-                var resultadoFilme = await Api.GetData<PesquisaFilmes>(pesqFilme);
+                var listGen = resultadoFilme.results[0].genre_ids;
+                List<string> gens = generoFilme.genres.Where(x => listGen.Contains(x.id)).Select(x => x.name).ToList();
 
 
             }

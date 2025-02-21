@@ -117,7 +117,7 @@ namespace TVPlus.Services
             return resposta;
         }
 
-        public async Task<object> GetData<T>(apiretorno data)
+        public async Task<dynamic> GetData<T>(apiretorno data)
         {
             var retorno = await Task.Run(() => JsonConvert.DeserializeObject<T>(data.data));
             return retorno;
