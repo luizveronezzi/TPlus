@@ -10,5 +10,7 @@ namespace TVPlus.Interface
         Task<Generos> GenerosSeries();
         Task<PesquisaFilmes> PesquisaFilmes(string pesquisa);
         Task<PesquisaSeries> PesquisaSeries(string pesquisa);
+        Task<VideosSeriesFilmes> VideosFilmes(int id);
+        Task<VideosSeriesFilmes> VideosSeries(int id);
     }
 }

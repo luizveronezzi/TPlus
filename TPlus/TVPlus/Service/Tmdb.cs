@@ -69,7 +69,7 @@ namespace TVPlus.Service
 
         public async Task<DetalheFilmes> DetalheFilmes(int id)
         {
-            _Api.SetParameters(new Dictionary<string, dynamic> { { "language", "pt" } });
+            _Api.SetParameters(new Dictionary<string, dynamic> { { "language", "pt-BR" } });
             var pesq = await _Api.GetAPI(@$"movie/{id}");
             var resultado = await _Api.GetData<DetalheFilmes>(pesq);
             return resultado;
@@ -77,9 +77,37 @@ namespace TVPlus.Service
 
         public async Task<DetalheSeries> DetalheSeries(int id)
         {
-            _Api.SetParameters(new Dictionary<string, dynamic> { { "language", "pt" } });
+            _Api.SetParameters(new Dictionary<string, dynamic> { { "language", "pt-BR" } });
             var pesq = await _Api.GetAPI(@$"tv/{id}");
             var resultado = await _Api.GetData<DetalheSeries>(pesq);
+            return resultado;
+        }
+
+        public async Task<VideosSeriesFilmes> VideosFilmes(int id)
+        {
+            _Api.SetParameters(new Dictionary<string, dynamic> { { "language", "pt-BR" } });
+            var pesq = await _Api.GetAPI(@$"movie/{id}/videos");
+            VideosSeriesFilmes resultado = await _Api.GetData<VideosSeriesFilmes>(pesq);
+            if (resultado.results.Count() == 0)
+            {
+                _Api.SetParameters(new Dictionary<string, dynamic> { { "language", "en-US" } });
+                pesq = await _Api.GetAPI(@$"movie/{id}/videos");
+                resultado = await _Api.GetData<VideosSeriesFilmes>(pesq);
+            }
+            return resultado;
+        }
+
+        public async Task<VideosSeriesFilmes> VideosSeries(int id)
+        {
+            _Api.SetParameters(new Dictionary<string, dynamic> { { "language", "pt-BR" } });
+            var pesq = await _Api.GetAPI(@$"tv/{id}/videos");
+            VideosSeriesFilmes resultado = await _Api.GetData<VideosSeriesFilmes>(pesq);
+            if (resultado.results.Count() == 0)
+            {
+                _Api.SetParameters(new Dictionary<string, dynamic> { { "language", "en-US" } });
+                pesq = await _Api.GetAPI(@$"tv/{id}/videos");
+                resultado = await _Api.GetData<VideosSeriesFilmes>(pesq);
+            }
             return resultado;
         }
 

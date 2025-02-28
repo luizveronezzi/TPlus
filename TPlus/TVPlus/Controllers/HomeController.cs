@@ -30,6 +30,8 @@ namespace TVPlus.Controllers
                 var listGen = resultadoFilme.results[0].genre_ids;
                 List<string> gens = generoFilme.genres.Where(x => listGen.Contains(x.id)).Select(x => x.name).ToList();
 
+                var vid = await _tmdb.VideosFilmes(resultadoFilme.results[0].id);
+                var vid1 = await _tmdb.VideosSeries(resultadoSerie.results[0].id);
 
             }
             catch (Exception e)
